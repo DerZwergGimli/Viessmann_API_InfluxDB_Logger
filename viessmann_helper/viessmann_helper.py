@@ -99,12 +99,12 @@ def get_update_token(viessmann_api_file_path: str):
 
 
 @logger.catch
-def get_installation_id_id(viessmann_api_file_path: str):
+def get_installation_id(viessmann_api_file_path: str):
     j_data = file_helper.read_file_to_json(viessmann_api_file_path)
     url = j_data["setup"]["parent_url"] + "installations"
     print("Calling: " + url)
     response_json = make_request(viessmann_api_file_path, url)
-    j_data["setup"]["installtion_id"] = response_json["data"][0]["id"]
+    j_data["setup"]["installation_id"] = response_json["data"][0]["id"]
     file_helper.write_json_to_file(viessmann_api_file_path, j_data)
 
 

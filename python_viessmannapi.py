@@ -1,6 +1,7 @@
 from viessmann_helper import viessmann_helper
 from influx_helper import influx_db_helper
 from loguru import logger
+import sys, getopt
 
 #Globals
 viessmann_api_file_path = "configs/viessmann_api.json"
@@ -19,18 +20,19 @@ def menu():
     print("7 = get_features_list_all")
     print("8 = get_features_form_list_by_device")
     print("9 = write_viessmann_data_to_influx_db")
+    print("10 = write_viessmann_data_to_influx_db [once and exit]")
     print("0 = exit")
     print("============================================")
     case = input("Enter NUMBER:")
 
     if case == "1":
-        viessmann_helper.token_authorize(viessmann_api_file_path)
+        viessmann_helper.authorize_token(viessmann_api_file_path)
     elif case == "2":
         viessmann_helper.get_token(viessmann_api_file_path)
     elif case == "3":
         viessmann_helper.get_update_token(viessmann_api_file_path)
     elif case == "4":
-        viessmann_helper.installation_id(viessmann_api_file_path)
+        viessmann_helper.get_installation_id(viessmann_api_file_path)
     elif case == "5":
         viessmann_helper.get_gateway_serial(viessmann_api_file_path)
     elif case == "6":
@@ -41,14 +43,37 @@ def menu():
         viessmann_helper.get_features_form_list_by_device(viessmann_api_file_path, "0")
     elif case == "9":
         influx_db_helper.write_viessmann_data_to_influx_db(inlfux_db_file_path, viessmann_helper.get_features_form_list_by_device(viessmann_api_file_path, "0"))
+    elif case == "10":
+        influx_db_helper.write_viessmann_data_to_influx_db(inlfux_db_file_path, viessmann_helper.get_features_form_list_by_device(viessmann_api_file_path, "0"))
+        quit()
     elif case == "0":
         quit()
     menu()
 
+
+def arguments(argv):
+    try:
+        opts, args = getopt.getopt(argv, "hr:", ["mode="])
+    except getopt.GetoptError:
+        print('python_viessmannapi.py -r auto')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('--> Help (python_viessmannapi.py):')
+            print('python_viessmannapi.py -r auto \t[to run without user interaction]')
+            print('python_viessmannapi.py \t\t[to run with user interaction]')
+            sys.exit()
+        elif opt in ("-r", "--mode"):
+            print("running in auto mode")
+            influx_db_helper.write_viessmann_data_to_influx_db(inlfux_db_file_path, viessmann_helper.get_features_form_list_by_device(viessmann_api_file_path, "0"))
+            quit()
+    menu()
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     logger.add("log_file.log", rotation="10 MB", colorize=True, format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}")
-    logger.info("TESTLog entry")
-    menu()
+    logger.info("Started...")
+    arguments(sys.argv[1:])
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

@@ -1,9 +1,9 @@
-def json_influx_template(measurement, time, deviceid,  value=0.0, unit='empty', status='empty'):
+def json_influx_template(measurement, time, device_id,  value=0.0, unit='empty', status='empty'):
     json_database_body = [
         {
             "measurement": measurement,
             "tags": {
-                "deviceId": deviceid,
+                "deviceId": device_id,
                 "region": "us-west"
             },
             "time": time,

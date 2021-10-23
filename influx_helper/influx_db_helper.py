@@ -1,11 +1,12 @@
 import socket
 
+import influxdb.exceptions
 import requests.exceptions
 import urllib3.exceptions
 
 from file_helper import file_helper
 from influxdb import InfluxDBClient
-import influx_templates
+from influx_helper import influx_templates
 from loguru import logger
 
 
@@ -40,7 +41,10 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
                 if data_point.get('properties').get('status'):
                     status = data_point.get('properties').get('status').get('value')
                 json_database_body = influx_templates.json_influx_template(data_point.get('feature'), data_point.get('timestamp'), data_point.get('deviceId'), value)
-                client.write_points(json_database_body)
+                try:
+                    client.write_points(json_database_body)
+                except influxdb.exceptions.InfluxDBClientError:
+                    logger.warning("Data was dropped - already written?")
                 print(json_database_body)
         except TypeError:
             logger.error("Error fetching data are you credentials correct?")
