@@ -1,0 +1,32 @@
+{
+    "credentials": {
+        "client_id": "XXXXXXXXXXXXXXXXXXXX",
+        "redirect_uri": "http://localhost:4200/",
+        "code_challenge": "XXXXXXXXXXXXXXXXXXXXXXXXX",
+        "scope": "IoT%20User%20offline_access",
+        "token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "access_token": "XXXXXXXXXX",
+        "refresh_token": "XXXXXXX",
+        "code": "XXXXXXXXXXXXXX",
+        "auto_refresh_token": 1
+    },
+    "setup": {
+        "parent_url": "https://api.viessmann.com/iot/v1/equipment/",
+        "installation_id": XXXXX,
+        "gateway_serial_id": "XXXXX"
+    },
+    "devices": [
+        {
+            "id": "0",
+            "features": []
+        },
+        {
+            "id": "RoomControl-1",
+            "features": []
+        },
+        {
+            "id": "TCU",
+            "features": []
+        }
+    ]
+}

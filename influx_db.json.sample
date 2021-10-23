@@ -1,0 +1,9 @@
+{
+    "credentials": {
+        "address": "10.42.0.22",
+        "port": 8086,
+        "user": "user",
+        "password": "password",
+        "database_name": "something"
+    }
+}
