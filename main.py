@@ -1,29 +1,13 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-#GLOBALS
-import json
-import re
-
-import influx_templates
-import pandas
-import requests
-from requests.structures import CaseInsensitiveDict
-import pandas as pd
-from influxdb import InfluxDBClient
 import viessmann_helper
 import influx_db_helper
 from loguru import logger
 
+#Globals
 viessmann_api_file_path = "viessmann_api.json"
 inlfux_db_file_path = "influx_db.json"
 
 
-
-def menue():
-
+def menu():
     print("============================================")
     print("Welcome to the Vissman API extractor")
     print("1 = CreateToken")
@@ -59,14 +43,12 @@ def menue():
         influx_db_helper.write_viessmann_data_to_influx_db(inlfux_db_file_path, viessmann_helper.get_features_form_list_by_device(viessmann_api_file_path, "0"))
     elif case == "0":
         quit()
-    menue()
+    menu()
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     logger.add("log_file.log", rotation="10 MB", colorize=True, format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}")
-
     logger.info("TESTLog entry")
-
-    menue()
+    menu()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

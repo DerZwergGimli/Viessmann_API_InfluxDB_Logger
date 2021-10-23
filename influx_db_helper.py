@@ -28,17 +28,20 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
         logger.error("ConnectionError when trying to connect to InfluxDB")
 
     if b_write_to_db:
-        for data_point in json_viessmann_data['data']:
-            value = 0.0
-            unit = "empty"
-            status = "none"
-            if data_point.get('properties').get('value'):
-                value = data_point.get('properties').get('value').get('value')
-            if data_point.get('properties').get('unit'):
-                unit = data_point.get('properties').get('unit').get('value')
-            if data_point.get('properties').get('status'):
-                status = data_point.get('properties').get('status').get('value')
-            json_database_body = influx_templates.json_influx_template(data_point.get('feature'), data_point.get('timestamp'), data_point.get('deviceId'), value)
-            client.write_points(json_database_body)
-            print(json_database_body)
+        try:
+            for data_point in json_viessmann_data['data']:
+                value = 0.0
+                unit = "empty"
+                status = "none"
+                if data_point.get('properties').get('value'):
+                    value = data_point.get('properties').get('value').get('value')
+                if data_point.get('properties').get('unit'):
+                    unit = data_point.get('properties').get('unit').get('value')
+                if data_point.get('properties').get('status'):
+                    status = data_point.get('properties').get('status').get('value')
+                json_database_body = influx_templates.json_influx_template(data_point.get('feature'), data_point.get('timestamp'), data_point.get('deviceId'), value)
+                client.write_points(json_database_body)
+                print(json_database_body)
+        except TypeError:
+            logger.error("Error fetching data are you credentials correct?")
 

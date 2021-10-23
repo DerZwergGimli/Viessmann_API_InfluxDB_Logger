@@ -10,6 +10,8 @@ This is a simple data logger for Viessmann API - Tested with 'Vitodens 300'
 ## Install and Requirements
 1. Install Python3 and pip3
 2. Activate Python-venv
-   1. Linux: 'source venv/bin/activate'
-   2. Windows: 'venv/bin/activate.ps1' [no tested]
+   1. Linux: `source venv/bin/activate`
+   2. Windows: `venv/bin/activate.ps1` [no tested]
 3. Install Python-Requirements 'pip3 install -r requirements.txt'
+4. Run the APP:
+   1. `python3 main.py`
