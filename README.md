@@ -26,6 +26,8 @@ This is a simple data logger for Viessmann API - Tested with 'Vitodens 300'
          3. Copy: 'Client_ID' to 'client_id' (in `config/viessmann_api.json`)
          4. Create a new 'Code_verifier' using: https://tonyxu-io.github.io/pkce-generator/
          5. Copy: 'Code_verifier' to 'code_challenge' (in `config/viessmann_api.json`)
-         6. Fetch all other data by starting the app follow the steps 1-7
 6. Run the APP:
-   1. `python3 main.py`
+   1. `python3 python_viessmannapi.py`
+      1. Fetch all other data by starting the app follow the steps 1-7
+   2. `python3 python_viessmannapi.py -h` to list commands
+   3. `python3 python_viessmannapi.py -r auto` to run one single query(API) and write to db

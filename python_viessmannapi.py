@@ -1,7 +1,10 @@
 from viessmann_helper import viessmann_helper
 from influx_helper import influx_db_helper
 from loguru import logger
-import sys, getopt
+import sys
+import getopt
+import time
+from tqdm import tqdm
 
 #Globals
 viessmann_api_file_path = "configs/viessmann_api.json"
@@ -52,20 +55,34 @@ def menu():
 
 
 def arguments(argv):
+    sleep_time = ''
     try:
-        opts, args = getopt.getopt(argv, "hr:", ["mode="])
+        opts, args = getopt.getopt(argv, "hrs:", ["rmode=", "stime="])
     except getopt.GetoptError:
-        print('python_viessmannapi.py -r auto')
+        print('python_viessmannapi.py -h')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
             print('--> Help (python_viessmannapi.py):')
             print('python_viessmannapi.py -r auto \t[to run without user interaction]')
+            print('python_viessmannapi.py -s 10 \t\t[to run without user interaction - time based (seconds)]')
             print('python_viessmannapi.py \t\t[to run with user interaction]')
             sys.exit()
         elif opt in ("-r", "--mode"):
             print("running in auto mode")
             influx_db_helper.write_viessmann_data_to_influx_db(inlfux_db_file_path, viessmann_helper.get_features_form_list_by_device(viessmann_api_file_path, "0"))
+            quit()
+        elif opt in ("-s", "--time"):
+            print("Running in sleep mode: [auto]")
+            sleep_time = arg
+            print("sleep_time=" + str(sleep_time))
+
+            while True:
+                influx_db_helper.write_viessmann_data_to_influx_db(inlfux_db_file_path, viessmann_helper.get_features_form_list_by_device(viessmann_api_file_path, "0"))
+                with tqdm(total=int(sleep_time)) as pbar:
+                    for i in range(int(sleep_time)):
+                        time.sleep(1)
+                        pbar.update(1)
             quit()
     menu()
 
