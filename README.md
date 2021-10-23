@@ -31,3 +31,6 @@ This is a simple data logger for Viessmann API - Tested with 'Vitodens 300'
       1. Fetch all other data by starting the app follow the steps 1-7
    2. `python3 python_viessmannapi.py -h` to list commands
    3. `python3 python_viessmannapi.py -r auto` to run one single query(API) and write to db
+
+## Additional
+   - Logging: A log file will be created at: `./log_file.log`
