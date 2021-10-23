@@ -1,10 +1,10 @@
-import viessmann_helper
-import influx_db_helper
+from viessmann_helper import viessmann_helper
+from influx_helper import influx_db_helper
 from loguru import logger
 
 #Globals
-viessmann_api_file_path = "viessmann_api.json"
-inlfux_db_file_path = "influx_db.json"
+viessmann_api_file_path = "configs/viessmann_api.json"
+inlfux_db_file_path = "configs/influx_db.json"
 
 
 def menu():

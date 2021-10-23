@@ -3,7 +3,7 @@ import socket
 import requests.exceptions
 import urllib3.exceptions
 
-import file_helper
+from file_helper import file_helper
 from influxdb import InfluxDBClient
 import influx_templates
 from loguru import logger

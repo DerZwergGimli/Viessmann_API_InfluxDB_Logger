@@ -1,4 +1,4 @@
-import file_helper
+from file_helper import file_helper
 import json
 import requests
 from requests.structures import CaseInsensitiveDict
