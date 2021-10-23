@@ -3,8 +3,8 @@
 This is a simple data logger for Viessmann API - Tested with 'Vitodens 300'
 
 ## Useful Links:
-- https://developer.viessmann.com/
-- https://www.viessmann-community.com/
+- https://developer.viessmann.com/ [API-Doc]
+- https://www.viessmann-community.com/ [Forum]
 
 
 ## Install and Requirements
