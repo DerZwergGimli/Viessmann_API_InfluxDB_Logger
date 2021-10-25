@@ -31,21 +31,36 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
     if b_write_to_db:
         try:
             for data_point in json_viessmann_data['data']:
-                value = 0.0
-                unit = "empty"
-                status = "none"
-                if data_point.get('properties').get('value'):
-                    value = data_point.get('properties').get('value').get('value')
-                if data_point.get('properties').get('unit'):
-                    unit = data_point.get('properties').get('unit').get('value')
-                if data_point.get('properties').get('status'):
-                    status = data_point.get('properties').get('status').get('value')
-                json_database_body = influx_templates.json_influx_template(data_point.get('feature'), data_point.get('timestamp'), data_point.get('deviceId'), value)
-                try:
-                    client.write_points(json_database_body)
-                except influxdb.exceptions.InfluxDBClientError:
-                    logger.warning("Data was dropped - already written?")
-                print(json_database_body)
+                if len(data_point.get('properties')) != 0:
+                    fields = {}
+                    for property in data_point.get("properties"):
+                        fields[str(property)] = data_point.get("properties").get(str(property)).get("value")
+                    tags = {"isEnabled": data_point.get("isEnabled"),
+                            "isReady": data_point.get("isReady"),
+                            "gatewayId": data_point.get("gatewayId"),
+                            "apiVersion": data_point.get("apiVersion")}
+
+                    json_database_body = influx_templates.json_influx_template_modular(
+                        measurement=data_point.get("feature"),
+                        time=data_point.get("timestamp"),
+                        tags=tags,
+                        fields=fields
+                    )
+                   # value = 0.0
+                   # unit = "empty"
+                   # status = "none"
+                   # if data_point.get('properties').get('value'):
+                   #     value = data_point.get('properties').get('value').get('value')
+                   # if data_point.get('properties').get('unit'):
+                   #     unit = data_point.get('properties').get('unit').get('value')
+                   # if data_point.get('properties').get('status'):
+                   #     status = data_point.get('properties').get('status').get('value')
+                   # json_database_body = influx_templates.json_influx_template(data_point.get('feature'), data_point.get('timestamp'), data_point.get('deviceId'), value)
+                    try:
+                        client.write_points(json_database_body)
+                    except influxdb.exceptions.InfluxDBClientError:
+                        logger.warning("Data was dropped - already written?")
+                    print(json_database_body)
         except TypeError:
-            logger.error("Error fetching data are you credentials correct?")
+            logger.warning("Error fetching data - fetched datapoint may be empty")
 

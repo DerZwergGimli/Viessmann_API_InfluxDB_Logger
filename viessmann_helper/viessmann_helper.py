@@ -177,6 +177,14 @@ def get_features_form_list_by_device(viessmann_api_file_path: str, device_name: 
 
 
 @logger.catch
+def get_features_form_list_all(viessmann_api_file_path: str):
+    j_data = file_helper.read_file_to_json(viessmann_api_file_path)
+    for device in j_data["devices"]:
+        print(device["id"])
+        get_features_form_list_by_device(viessmann_api_file_path, device["id"])
+
+
+@logger.catch
 def make_request(viessmann_api_file_path: str, url: str):
     logger.info("Making request to Viessmann API")
     req_header = CaseInsensitiveDict()
