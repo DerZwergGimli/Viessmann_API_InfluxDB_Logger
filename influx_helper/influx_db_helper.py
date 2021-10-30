@@ -46,20 +46,14 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
                         tags=tags,
                         fields=fields
                     )
-                   # value = 0.0
-                   # unit = "empty"
-                   # status = "none"
-                   # if data_point.get('properties').get('value'):
-                   #     value = data_point.get('properties').get('value').get('value')
-                   # if data_point.get('properties').get('unit'):
-                   #     unit = data_point.get('properties').get('unit').get('value')
-                   # if data_point.get('properties').get('status'):
-                   #     status = data_point.get('properties').get('status').get('value')
-                   # json_database_body = influx_templates.json_influx_template(data_point.get('feature'), data_point.get('timestamp'), data_point.get('deviceId'), value)
+
                     try:
                         client.write_points(json_database_body)
-                    except influxdb.exceptions.InfluxDBClientError:
-                        logger.warning("Data was dropped - already written?")
+                    except influxdb.exceptions.InfluxDBClientError as e:
+                        if e.code == 400:
+                            logger.warning("Data was dropped - already written?")
+                        else:
+                            logger.error("Data was dropped!!!")
                     print(json_database_body)
         except TypeError:
             logger.warning("Error fetching data - fetched datapoint may be empty")

@@ -92,7 +92,7 @@ def arguments(argv):
 if __name__ == '__main__':
     logger.add("log_file.log", rotation="10 MB", colorize=True, format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}")
     logger.info("Started...")
-    influx_helper.influx_templates.json_influx_template_modular("api.key.name", "1234566:00", {"tag1":"name", "tag2":"name"}, {"tag1":"name", "tag2":"name"})
+    #influx_helper.influx_templates.json_influx_template_modular("api.key.name", "1234566:00", {"tag1":"name", "tag2":"name"}, {"tag1":"name", "tag2":"name"})
 
     arguments(sys.argv[1:])
 
