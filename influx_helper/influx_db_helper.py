@@ -12,7 +12,7 @@ from loguru import logger
 
 def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_data):
     json_influx = file_helper.read_file_to_json(inlfux_db_file_path)
-    b_write_to_db = False
+    b_write_to_db = True
     try:
         client = InfluxDBClient(json_influx["credentials"]["address"],
                                 json_influx["credentials"]["port"],
@@ -35,11 +35,18 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
                     fields = {}
                     for property in data_point.get("properties"):
                         fields[str(property)] = data_point.get("properties").get(str(property)).get("value")
+
+                    # Default Tags
                     tags = {"isEnabled": data_point.get("isEnabled"),
                             "isReady": data_point.get("isReady"),
                             "gatewayId": data_point.get("gatewayId"),
                             "apiVersion": data_point.get("apiVersion")}
-
+                    # Tags from features
+                    fullName = data_point.get("feature")
+                    splitedNames = fullName.split(".")
+                    print(splitedNames)
+                    for idx, name in enumerate(splitedNames):
+                        tags["tag_"+str(idx)] = str(name)
                     json_database_body = influx_templates.json_influx_template_modular(
                         measurement=data_point.get("feature"),
                         time=data_point.get("timestamp"),

@@ -72,6 +72,7 @@ def arguments(argv):
         elif opt in ("-r", "--mode"):
             print("running in auto mode")
             influx_db_helper.write_viessmann_data_to_influx_db(inlfux_db_file_path, viessmann_helper.get_features_form_list_by_device(viessmann_api_file_path, "0"))
+            logger.info("{SingleRun} Done bye...!")
             quit()
         elif opt in ("-s", "--time"):
             print("Running in sleep mode: [auto]")

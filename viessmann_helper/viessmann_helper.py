@@ -4,6 +4,7 @@ import requests
 from requests.structures import CaseInsensitiveDict
 from loguru import logger
 
+printDebug = False
 
 @logger.catch
 def authorize_token(viessmann_api_file_path: str):
@@ -82,8 +83,9 @@ def get_update_token(viessmann_api_file_path: str):
 
     resp = requests.post(req_url, headers=headers, data=req_data)
 
-    print(resp.status_code)
-    print(resp.text)
+    if printDebug:
+        print(resp.status_code)
+        print(resp.text)
 
     if resp.status_code == 200:
         resp_json = resp.json()
@@ -105,6 +107,7 @@ def get_installation_id(viessmann_api_file_path: str):
     print("Calling: " + url)
     response_json = make_request(viessmann_api_file_path, url)
     j_data["setup"]["installation_id"] = response_json["data"][0]["id"]
+    print("Installation_ID: " + str(j_data["setup"]["installation_id"]))
     file_helper.write_json_to_file(viessmann_api_file_path, j_data)
 
 
@@ -115,6 +118,7 @@ def get_gateway_serial(viessmann_api_file_path: str):
     print("Calling: " + url)
     response_json = make_request(viessmann_api_file_path, url)
     j_data["setup"]["gateway_serial_id"] = response_json["data"][0]["serial"]
+    print("Gateway-Serial_ID: " + str(j_data["setup"]["gateway_serial_id"]))
     file_helper.write_json_to_file(viessmann_api_file_path, j_data)
 
 
@@ -198,7 +202,8 @@ def make_request(viessmann_api_file_path: str, url: str):
     logger.info("ViessmannAPI: Request Status-Code=" + str(response.status_code))
     if response.status_code == 200:
         response_json = response.json()
-        print(json.dumps(response_json, indent=4, sort_keys=True))
+        if(printDebug):
+            print(json.dumps(response_json, indent=4, sort_keys=True))
         return response_json
     elif response.status_code == 401:
         logger.warning("Access token expired - creating a new one...")
