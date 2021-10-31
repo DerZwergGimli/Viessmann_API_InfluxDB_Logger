@@ -199,10 +199,13 @@ def make_request(viessmann_api_file_path: str, url: str):
     f_credentials.close()
 
     response = requests.get(url, headers=req_header)
-    logger.info("ViessmannAPI: Request Status-Code=" + str(response.status_code))
+    if response.status_code == 200:
+        logger.info("ViessmannAPI: Request Status-Code=" + str(response.status_code))
+    else:
+        logger.error("ViessmannAPI: Request Status-Code=" + str(response.status_code))
     if response.status_code == 200:
         response_json = response.json()
-        if(printDebug):
+        if printDebug:
             print(json.dumps(response_json, indent=4, sort_keys=True))
         return response_json
     elif response.status_code == 401:
