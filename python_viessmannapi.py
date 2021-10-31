@@ -60,7 +60,7 @@ def arguments(argv):
     try:
         opts, args = getopt.getopt(argv, "hrs:", ["rmode=", "stime="])
     except getopt.GetoptError:
-        print('python_viessmannapi.py -h')
+        print('python_viessmannapi.py -h ')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
