@@ -42,18 +42,20 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
                             "gatewayId": data_point.get("gatewayId"),
                             "apiVersion": data_point.get("apiVersion")}
                     # Tags from features
-                    fullName = data_point.get("feature")
-                    splitedNames = fullName.split(".")
-                    print(splitedNames)
-                    for idx, name in enumerate(splitedNames):
+                    full_name = data_point.get("feature")
+                    split_name = full_name.split(".")
+                    for idx, name in enumerate(split_name):
                         tags["tag_"+str(idx)] = str(name)
+                    full_feature = data_point.get("feature")
+                    split_feature = full_feature.split(".")
+
                     json_database_body = influx_templates.json_influx_template_modular(
-                        measurement=data_point.get("feature"),
+                        measurement=split_feature[0] + "." + split_feature[1],
                         time=data_point.get("timestamp"),
                         tags=tags,
                         fields=fields
                     )
-
+                    print(json_database_body)
                     try:
                         client.write_points(json_database_body)
                     except influxdb.exceptions.InfluxDBClientError as e:
@@ -61,7 +63,7 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
                             logger.warning("Data was dropped - already written?")
                         else:
                             logger.error("Data was dropped!!!")
-                    print(json_database_body)
+
         except TypeError:
             logger.warning("Error fetching data - fetched datapoint may be empty")
 
