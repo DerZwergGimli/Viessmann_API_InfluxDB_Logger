@@ -1,4 +1,5 @@
 import socket
+import time
 
 import influxdb.exceptions
 import requests.exceptions
@@ -12,7 +13,7 @@ from loguru import logger
 
 def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_data):
     json_influx = file_helper.read_file_to_json(inlfux_db_file_path)
-    b_write_to_db = True
+    b_write_to_db = False
     try:
         client = InfluxDBClient(json_influx["credentials"]["address"],
                                 json_influx["credentials"]["port"],
@@ -66,4 +67,27 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
 
         except TypeError:
             logger.warning("Error fetching data - fetched datapoint may be empty")
-
+            if json_viessmann_data == 1:
+                print("data is 1")
+            return 1
+        except KeyError:
+            logger.warning("Error data is not like expected!")
+            tags = {"type": "error"}
+            fields = {"statusCode": json_viessmann_data.get("statusCode"),
+                      "errorType": json_viessmann_data.get("errorType"),
+                      "message": json_viessmann_data.get("message"),
+                      "viErrorId": json_viessmann_data.get("viErrorId")}
+            json_database_body = influx_templates.json_influx_template_modular(
+                measurement="api.status",
+                time=time.time(),
+                tags=tags,
+                fields=fields
+            )
+            try:
+                client.write_points(json_database_body)
+            except influxdb.exceptions.InfluxDBClientError as e:
+                if e.code == 400:
+                    logger.warning("Data was dropped - already written?")
+                else:
+                    logger.error("Data was dropped!!!")
+            return 0

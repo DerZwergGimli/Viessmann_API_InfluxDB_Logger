@@ -217,5 +217,5 @@ def make_request(viessmann_api_file_path: str, url: str):
         logger.error("Unable to handle Viessmann API error")
         response_json = response.json()
         print(json.dumps(response_json, indent=4, sort_keys=True))
-        return 1
+        return response_json
 

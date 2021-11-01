@@ -3,11 +3,13 @@
 This is a simple data logger for Viessmann API - Tested with 'Vitodens 300'
 
 ## Useful Links:
+
 - https://developer.viessmann.com/ [API-Doc]
 - https://www.viessmann-community.com/ [Forum]
 
 
 ## Install and Requirements
+
 1. Install Python3 and pip3
 2. Run: `python3 -m venv venv` to create venv
 3. Activate Python-venv
