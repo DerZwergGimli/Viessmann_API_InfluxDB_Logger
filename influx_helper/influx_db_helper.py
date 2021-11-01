@@ -78,7 +78,7 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
                       "viErrorId": json_viessmann_data.get("viErrorId")}
             json_database_body = influx_templates.json_influx_template_modular(
                 measurement="api.status",
-                time=datetime.datetime.now(),
+                time=datetime.datetime.now().timetuple(),
                 tags=tags,
                 fields=fields
             )
