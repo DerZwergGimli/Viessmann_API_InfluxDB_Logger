@@ -51,10 +51,10 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
                     write_influx(client_influx, json_database_body)
             # Status Entry - Success
             tags = {"type": "status"}
-            fields = {"statusCode": 200,
+            fields = {"statusCode": "200",
                       "errorType": "none",
                       "message": "ok",
-                      "viErrorId": 0}
+                      "viErrorId": "0"}
             json_database_body = influx_templates.json_influx_template_modular(
                 measurement="api.status",
                 time=datetime.datetime.now(),
