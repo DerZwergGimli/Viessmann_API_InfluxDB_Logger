@@ -14,21 +14,11 @@ from loguru import logger
 
 def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_data):
     json_influx = file_helper.read_file_to_json(inlfux_db_file_path)
-    b_write_to_db = True
-    try:
-        client = InfluxDBClient(json_influx["credentials"]["address"],
-                                json_influx["credentials"]["port"],
-                                json_influx["credentials"]["user"],
-                                json_influx["credentials"]["password"],
-                                json_influx["credentials"]["database_name"],
-                                timeout=1)
 
-        client.create_database(json_influx["credentials"]["database_name"])
+    client_influx = connect_influx(json_influx)
+
+    if client_influx != 1:
         b_write_to_db = True
-    except (socket.timeout, urllib3.exceptions.ConnectTimeoutError, requests.exceptions.ConnectTimeout):
-        logger.error("Timeout when trying to connect to InfluxDB")
-    except requests.exceptions.ConnectionError:
-        logger.error("ConnectionError when trying to connect to InfluxDB")
 
     if b_write_to_db:
         try:
@@ -58,13 +48,20 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
                         fields=fields
                     )
                     print(json_database_body)
-                    try:
-                        client.write_points(json_database_body)
-                    except influxdb.exceptions.InfluxDBClientError as e:
-                        if e.code == 400:
-                            logger.warning("Data was dropped - already written?")
-                        else:
-                            logger.error("Data was dropped!!!")
+                    write_influx(client_influx, json_database_body)
+            # Status Entry - Success
+            tags = {"type": "status"}
+            fields = {"statusCode": 200,
+                      "errorType": "none",
+                      "message": "ok",
+                      "viErrorId": 0}
+            json_database_body = influx_templates.json_influx_template_modular(
+                measurement="api.status",
+                time=datetime.datetime.now(),
+                tags=tags,
+                fields=fields
+            )
+            write_influx(client_influx, json_database_body)
 
         except TypeError:
             logger.warning("Error fetching data - fetched datapoint may be empty")
@@ -72,8 +69,9 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
                 print("data is 1")
             return 1
         except KeyError:
+            # Status Entry - Error
             logger.warning("Error data is not like expected!")
-            tags = {"type": "error"}
+            tags = {"type": "status"}
             fields = {"statusCode": json_viessmann_data.get("statusCode"),
                       "errorType": json_viessmann_data.get("errorType"),
                       "message": json_viessmann_data.get("message"),
@@ -84,11 +82,38 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
                 tags=tags,
                 fields=fields
             )
-            try:
-                client.write_points(json_database_body)
-            except influxdb.exceptions.InfluxDBClientError as e:
-                if e.code == 400:
-                    logger.warning("Data was dropped - already written?")
-                else:
-                    logger.error("Data was dropped!!!")
+            write_influx(client_influx, json_database_body)
             return 0
+
+
+def connect_influx(json_influx):
+    # Connect to InfluxDB
+    try:
+        client_influx = InfluxDBClient(json_influx["credentials"]["address"],
+                                json_influx["credentials"]["port"],
+                                json_influx["credentials"]["user"],
+                                json_influx["credentials"]["password"],
+                                json_influx["credentials"]["database_name"],
+                                timeout=1)
+
+        client_influx.create_database(json_influx["credentials"]["database_name"])
+        b_write_to_db = True
+        return client_influx
+    except (socket.timeout, urllib3.exceptions.ConnectTimeoutError, requests.exceptions.ConnectTimeout):
+        logger.error("Timeout when trying to connect to InfluxDB")
+        return 1
+    except requests.exceptions.ConnectionError:
+        logger.error("ConnectionError when trying to connect to InfluxDB")
+        return 1
+
+
+def write_influx(client_influx, json_database_body):
+    # Write to InfluxDB
+    try:
+        client_influx.write_points(json_database_body)
+    except influxdb.exceptions.InfluxDBClientError as e:
+        if e.code == 400:
+            logger.warning("Data was dropped - already written?")
+        else:
+            logger.error("Data was dropped!!!")
+
