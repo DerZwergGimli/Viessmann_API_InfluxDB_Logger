@@ -1,6 +1,6 @@
 import datetime
 import socket
-import time
+from datetime import datetime, timezone, timedelta
 
 import influxdb.exceptions
 import requests.exceptions
@@ -14,13 +14,11 @@ from loguru import logger
 
 def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_data):
     json_influx = file_helper.read_file_to_json(inlfux_db_file_path)
-
     client_influx = connect_influx(json_influx)
 
+    timezone_offset = +1.0  # Berlin Time (UTC−01:00)
+    tzinfo = timezone(timedelta(hours=timezone_offset))
     if client_influx != 1:
-        b_write_to_db = True
-
-    if b_write_to_db:
         try:
             for data_point in json_viessmann_data['data']:
                 if len(data_point.get('properties')) != 0:
@@ -29,7 +27,8 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
                         fields[str(property)] = data_point.get("properties").get(str(property)).get("value")
 
                     # Default Tags
-                    tags = {"isEnabled": data_point.get("isEnabled"),
+                    tags = {"featureName": data_point.get("feature"),
+                            "isEnabled": data_point.get("isEnabled"),
                             "isReady": data_point.get("isReady"),
                             "gatewayId": data_point.get("gatewayId"),
                             "apiVersion": data_point.get("apiVersion")}
@@ -51,13 +50,13 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
                     write_influx(client_influx, json_database_body)
             # Status Entry - Success
             tags = {"type": "status"}
-            fields = {"statusCode": "200",
+            fields = {"statusCode": 200,
                       "errorType": "none",
                       "message": "ok",
                       "viErrorId": "0"}
             json_database_body = influx_templates.json_influx_template_modular(
                 measurement="api.status",
-                time=datetime.datetime.now(),
+                time=str(datetime.now(tzinfo)),
                 tags=tags,
                 fields=fields
             )
@@ -78,7 +77,7 @@ def write_viessmann_data_to_influx_db(inlfux_db_file_path: str, json_viessmann_d
                       "viErrorId": json_viessmann_data.get("viErrorId")}
             json_database_body = influx_templates.json_influx_template_modular(
                 measurement="api.status",
-                time=datetime.datetime.now().timetuple(),
+                time=str(datetime.now(tzinfo)),
                 tags=tags,
                 fields=fields
             )
